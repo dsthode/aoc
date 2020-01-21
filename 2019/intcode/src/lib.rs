@@ -35,7 +35,32 @@ impl Computer {
   }
 
   pub fn volcar_memoria(&self) {
-      print!("pc:{} - {:?}\n", self.pc, self.memoria);
+      println!("pc:{} - {:?}", self.pc, self.memoria);
+  }
+
+  fn modo_parametro(&self, opcode:i32, num_param:u32) -> i32 {
+      let divisor:i32 = (10 as i32).pow(1 + num_param);
+      let posicion = opcode / divisor;
+      posicion % 10
+  }
+
+  fn leer_parametro(&self, opcode: i32, num_param: u32) -> i32 {
+    let modo = self.modo_parametro(opcode, num_param);
+    match modo {
+        0 => {
+            let addr = self.leer_memoria(self.pc+(num_param as usize));
+            self.leer_memoria(usize::try_from(addr).unwrap())
+        },
+        1 => {
+            if num_param == 3 {
+                panic!("Error: el modo de variable inmediato para escritura no es valido");
+            }
+            self.leer_memoria(self.pc+(num_param as usize))
+        },
+        _ => {
+            panic!("Error: modo de acceso a memoria desconocido {}", modo);
+        }
+    }
   }
 
   pub fn ejecutar(&mut self) -> bool {
@@ -44,24 +69,24 @@ impl Computer {
       }
       match self.memoria[self.pc] % 100 {
           1 => {
-              let addr_1 = self.leer_memoria(self.pc+1);
-              let addr_2 = self.leer_memoria(self.pc+2);
+              let param1 = self.leer_parametro(self.memoria[self.pc], 1);
+              let param2 = self.leer_parametro(self.memoria[self.pc], 2);
+              assert!(self.modo_parametro(self.memoria[self.pc], 3) == 0);
               let addr_res = self.leer_memoria(self.pc+3);
               self.establecer_memoria(
                   usize::try_from(addr_res).unwrap(), 
-                  self.leer_memoria(usize::try_from(addr_1).unwrap()) 
-                      + self.leer_memoria(usize::try_from(addr_2).unwrap()));
+                  param1 + param2);
               self.pc += 4;
               true
           },
           2 => {
-              let addr_1 = self.leer_memoria(self.pc+1);
-              let addr_2 = self.leer_memoria(self.pc+2);
-              let addr_res = self.leer_memoria(self.pc+3);
+            let param1 = self.leer_parametro(self.memoria[self.pc], 1);
+            let param2 = self.leer_parametro(self.memoria[self.pc], 2);
+            assert!(self.modo_parametro(self.memoria[self.pc], 3) == 0);
+            let addr_res = self.leer_memoria(self.pc+3);
               self.establecer_memoria(
                   usize::try_from(addr_res).unwrap(), 
-                  self.leer_memoria(usize::try_from(addr_1).unwrap()) 
-                      * self.leer_memoria(usize::try_from(addr_2).unwrap()));
+                  param1 * param2);
               self.pc += 4;
               true
           },
@@ -69,18 +94,21 @@ impl Computer {
               let addr = self.leer_memoria(self.pc+1);
               let mut result : bool = true;
               let mut line = String::new();
+              print!("Entrada: ");
+              io::stdout().flush().unwrap();
               match io::stdin().read_line(&mut line) {
                   Ok(_) => {
                     self.establecer_memoria(
                         usize::try_from(addr).unwrap(),
-                        line.parse::<i32>().unwrap()
+                        line.trim().parse::<i32>().unwrap()
                     );
                   },
                   Err(error) => {
-                      println!("Error: {}", error);
-                    result = false;
+                      eprintln!("Error: {}", error);
+                      result = false;
                   }
               }
+              self.pc += 2;
               result
           },
           4 => {

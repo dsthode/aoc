@@ -24,7 +24,6 @@ impl Map {
     }
 
     fn avanzar(&mut self, x: usize, y: usize) -> Option<char> {
-//        println!("posicion actual: {},{}", self.x, self.y);
         let old_x = self.x;
         let old_y = self.y;
         self.x += x;
@@ -37,7 +36,6 @@ impl Map {
             self.y = old_y;
             return None;
         }
-//        println!("posicion nueva: {},{}: {:?}", self.x, self.y, self.lines[self.y].chars().nth(self.x));
         self.lines[self.y].chars().nth(self.x)
     }
 
@@ -62,7 +60,7 @@ fn main() {
     }
     println!("arboles:{}", posiciones.iter().filter(|x| **x == '#').count());
     map.rebobinar();
-    posiciones = Vec::new();
+    posiciones.clear();
     while !map.es_final() {
         match map.avanzar(3, 1) {
             Some(casilla) => posiciones.push(casilla),
@@ -71,7 +69,7 @@ fn main() {
     }
     println!("arboles:{}", posiciones.iter().filter(|x| **x == '#').count());
     map.rebobinar();
-    posiciones = Vec::new();
+    posiciones.clear();
     while !map.es_final() {
         match map.avanzar(5, 1) {
             Some(casilla) => posiciones.push(casilla),
@@ -80,7 +78,7 @@ fn main() {
     }
     println!("arboles:{}", posiciones.iter().filter(|x| **x == '#').count());
     map.rebobinar();
-    posiciones = Vec::new();
+    posiciones.clear();
     while !map.es_final() {
         match map.avanzar(7, 1) {
             Some(casilla) => posiciones.push(casilla),
@@ -89,7 +87,7 @@ fn main() {
     }
     println!("arboles:{}", posiciones.iter().filter(|x| **x == '#').count());
     map.rebobinar();
-    posiciones = Vec::new();
+    posiciones.clear();
     while !map.es_final() {
         match map.avanzar(1, 2) {
             Some(casilla) => posiciones.push(casilla),

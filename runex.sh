@@ -1,4 +1,4 @@
-$CONTAINER_VERSION=elixir:1.12
+CONTAINER_VERSION=elixir:1.12
 
 docker run \
  -it \

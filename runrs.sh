@@ -1,4 +1,4 @@
-CONTAINER_VERSION=rust:1.48
+CONTAINER_VERSION=rust:1.66
 
 docker run \
 	-it \

@@ -1,4 +1,4 @@
-CONTAINER_VERSION=rust:1.66
+CONTAINER_VERSION=rust:1.74
 
 docker run \
 	-it \
@@ -10,4 +10,3 @@ docker run \
 	-e "RUST_BACKTRACE=1" \
 	$CONTAINER_VERSION \
 	$*
-

@@ -6,6 +6,7 @@ const LETTERS: &str = ".abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 fn main() {
   let mut repeated: Vec<char> = Vec::new();
+  let mut repeated2: Vec<char> = Vec::new();
   let mut sum_prio = 0;
   let file = File::open("input.txt").unwrap();
   for line in BufReader::new(file).lines() {
@@ -17,11 +18,26 @@ fn main() {
     }
   }
   for ch in repeated {
-    let prio = char_to_prio(ch);
-    println!("{} prio is {}", ch, prio);
     sum_prio += char_to_prio(ch);
   }
-  println!("La suma de las prioridades de fase 1 es:{}", sum_prio)
+  println!("La suma de las prioridades de parte 1 es:{}", sum_prio);
+  let file = File::open("input.txt").unwrap();
+  let mut lines = BufReader::new(file).lines();
+  while let Some(line1) = lines.next() {
+    let line2 = lines.next().unwrap();
+    let line3 = lines.next().unwrap();
+    part2(
+      &line1.unwrap(),
+      &line2.unwrap(),
+      &line3.unwrap(),
+      &mut repeated2,
+    )
+  }
+  sum_prio = 0;
+  for ch in repeated2 {
+    sum_prio += char_to_prio(ch);
+  }
+  println!("La suma de las prioridades de parte 2 es:{}", sum_prio);
 }
 
 fn part1(line: &[u8], repeated: &mut Vec<char>) {
@@ -42,6 +58,16 @@ fn part1(line: &[u8], repeated: &mut Vec<char>) {
       repeated.push(line[mid + idx] as char);
     }
     idx += 1;
+  }
+}
+
+fn part2(line1: &str, line2: &str, line3: &str, repeated: &mut Vec<char>) {
+  let mut local_repeated = HashSet::<char>::new();
+  for ch in line1.chars() {
+    if line2.contains(ch) && line3.contains(ch) && !local_repeated.contains(&ch) {
+      local_repeated.insert(ch);
+      repeated.push(ch);
+    }
   }
 }
 

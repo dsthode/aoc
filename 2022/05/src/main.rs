@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 struct Move {
-  amount: u32,
+  amount: usize,
   from: usize,
   to: usize,
 }
@@ -17,7 +17,7 @@ fn main() {
   }
   load_file(&mut stack, &mut moves);
   part1(stack.clone(), &moves);
-  println!("");
+  part2(stack.clone(), &moves);
 }
 
 fn load_file(stack: &mut Vec<VecDeque<char>>, moves: &mut Vec<Move>) {
@@ -42,7 +42,7 @@ fn process_line(line: &str, stack: &mut Vec<VecDeque<char>>, moves: &mut Vec<Mov
   }
   match moves_rx.captures(line) {
     Some(caps) => {
-      let amount = caps.get(1).unwrap().as_str().parse::<u32>().unwrap();
+      let amount = caps.get(1).unwrap().as_str().parse::<usize>().unwrap();
       let from = caps.get(2).unwrap().as_str().parse::<usize>().unwrap();
       let to = caps.get(3).unwrap().as_str().parse::<usize>().unwrap();
       moves.push(Move { amount, from, to })
@@ -78,4 +78,21 @@ fn part1(mut stack: Vec<VecDeque<char>>, moves: &Vec<Move>) {
   for v in stack.into_iter() {
     print!("{}", v.get(0).unwrap());
   }
+  println!("")
+}
+
+fn part2(mut stack: Vec<VecDeque<char>>, moves: &Vec<Move>) {
+  for step in moves {
+    let mut chrs: Vec<char> = Vec::new();
+    for _ in 0..step.amount {
+      chrs.push(stack[step.from - 1].pop_front().unwrap());
+    }
+    for idx in 0..step.amount {
+      stack[step.to - 1].push_front(chrs[step.amount - idx - 1]);
+    }
+  }
+  for v in stack.into_iter() {
+    print!("{}", v.get(0).unwrap());
+  }
+  println!("");
 }
